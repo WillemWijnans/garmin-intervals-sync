@@ -1,0 +1,37 @@
+# Garmin → Intervals.icu wellness field mapping
+#
+# garmin_path:      dot.path into the merged Garmin response dict
+# intervals_field:  field name for the Intervals.icu wellness PUT
+# convert:          optional unit conversion (grams_to_kg | ms_to_seconds | omit for none)
+# custom:           optional — set to true for Intervals.icu custom fields
+#                   (sent under {"custom": {...}} in the PUT body)
+#
+# Data sources per field:
+#   get_stats()               → restingHeartRate, averageSpo2, avgWakingRespirationValue
+#   get_max_metrics()         → vo2Max (synthetic top-level, extracted from cycling/generic)
+#   get_body_composition()    → totalAverage.weight (BMI/body fat are not synced; revisit later)
+#   get_hrv_data()            → hrvSummary.weeklyAvg, hrvSummary.lastNight5MinHigh
+#   get_sleep_data()          → dailySleepDTO.avgHeartRate
+#   get_training_readiness()  → trainingReadiness (synthetic top-level, wake-up score)
+
+mappings:
+  - garmin_path: restingHeartRate
+    intervals_field: restingHR
+  - garmin_path: vo2Max
+    intervals_field: vo2max
+  - garmin_path: trainingReadiness
+    intervals_field: readiness
+  - garmin_path: avgWakingRespirationValue
+    intervals_field: respiration
+  - garmin_path: averageSpo2
+    intervals_field: spO2
+  - garmin_path: totalAverage.weight
+    intervals_field: weight
+    convert: grams_to_kg
+  - garmin_path: hrvSummary.weeklyAvg
+    intervals_field: hrv
+  - garmin_path: dailySleepDTO.avgHeartRate
+    intervals_field: avgSleepingHR
+  - garmin_path: hrvSummary.lastNight5MinHigh
+    intervals_field: HrvLastNight5MinHigh
+    custom: true
