@@ -194,6 +194,10 @@ def main() -> None:
         "--end", type=date.fromisoformat, default=None,
         help="End date for targeted backfill (YYYY-MM-DD, defaults to yesterday)",
     )
+    parser.add_argument(
+        "--include-today", action="store_true",
+        help="Include today in the sync window (use only after morning data has settled in Garmin)",
+    )
     args = parser.parse_args()
 
     setup_logging(verbose=args.verbose)
@@ -215,7 +219,9 @@ def main() -> None:
         sys.exit(1)
 
     # --- Compute date range ---
-    yesterday = date.today() - timedelta(days=1)
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+    max_allowed = today if args.include_today else yesterday
 
     if args.end and not args.start:
         logger.error("--end requires --start")
@@ -223,19 +229,20 @@ def main() -> None:
 
     if args.start:
         start_date = args.start
-        end_date = args.end if args.end else yesterday
+        end_date = args.end if args.end else max_allowed
     else:
-        end_date = yesterday
+        end_date = max_allowed
         start_date = end_date - timedelta(days=args.days - 1)
 
     if start_date > end_date:
         logger.error("--start (%s) is after --end (%s)", start_date, end_date)
         sys.exit(1)
 
-    if end_date > yesterday:
-        logger.error(
-            "Cannot sync today or future dates — Garmin data is incomplete mid-day"
-        )
+    if end_date > max_allowed:
+        if args.include_today:
+            logger.error("Cannot sync future dates")
+        else:
+            logger.error("Cannot sync today or future dates without --include-today")
         sys.exit(1)
 
     num_days = (end_date - start_date).days + 1

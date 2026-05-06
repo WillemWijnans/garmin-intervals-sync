@@ -104,6 +104,13 @@ Use `--start` and `--end` to sync a specific date range (e.g., after first setup
 python sync.py --verbose --start 2024-09-01 --end 2025-08-31
 ```
 
+**Manual sync including today**
+By default the script never touches today's data (Garmin's metrics are still being computed mid-day). If you want to manually sync today after morning data has settled in Garmin Connect (typically by 9-10am for sleep/HRV/readiness):
+
+```bash
+python sync.py --verbose --days 1 --include-today
+```
+
 **"Garmin auth failed"**
 Run `python sync.py --reauth` interactively. Garmin may have triggered MFA, which requires a terminal prompt. EU/Netherlands accounts are challenged more frequently.
 
