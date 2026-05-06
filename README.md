@@ -5,7 +5,7 @@ Syncs wellness data from Garmin Connect to [Intervals.icu](https://intervals.icu
 ## Prerequisites
 
 - **Python 3.12+** (check with `python3 --version`)
-- **macOS** (credentials stored in Keychain via `keyring`)
+- **macOS or Linux**
 - **Garmin Connect account** with wellness data
 - **Intervals.icu account** with an API key ([Settings → Developer](https://intervals.icu/settings))
 
@@ -19,19 +19,25 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## One-Time Keychain Setup
+## Credential Setup
 
-Run these from inside the activated venv. Replace the placeholder values with your actual credentials.
+Credentials can be provided via `.env` file (recommended, works everywhere) or macOS Keychain (fallback). The script checks `.env` first, then Keychain for any missing values.
+
+### Option A: .env file (Linux, VPS, or Mac)
 
 ```bash
-# Garmin Connect credentials
+cp .env.example .env
+# Edit .env with your actual credentials
+```
+
+The `.env` file is gitignored and never committed.
+
+### Option B: macOS Keychain (Mac only, backward compatible)
+
+```bash
 python3 -c "import keyring; keyring.set_password('garmin', 'username', 'your-garmin-email@example.com')"
 python3 -c "import keyring; keyring.set_password('garmin', 'password', 'your-garmin-password')"
-
-# Intervals.icu API key (from https://intervals.icu/settings → Developer Settings)
 python3 -c "import keyring; keyring.set_password('intervals', 'api_key', 'your-intervals-api-key')"
-
-# Intervals.icu athlete ID (the "i12345" in your Intervals URL: intervals.icu/athlete/i12345)
 python3 -c "import keyring; keyring.set_password('intervals', 'athlete_id', 'i12345')"
 ```
 
@@ -142,6 +148,8 @@ garmin-intervals-sync/
 ├── intervals.py                   # Intervals.icu client (PUT wellness data)
 ├── config/
 │   └── wellness_mapping.yaml      # Garmin → Intervals field mapping (single source of truth)
+├── .env.example                   # Credential template (copy to .env)
+├── .gitignore
 ├── requirements.txt
 └── README.md
 ```

@@ -8,8 +8,10 @@ from datetime import date, timedelta
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
-import keyring
+import os
+
 import yaml
+from dotenv import load_dotenv
 
 from garmin import GarminAuthError, GarminClient
 from intervals import IntervalsAuthError, IntervalsClient
@@ -72,23 +74,37 @@ def load_config() -> list[dict]:
 
 
 def load_credentials() -> dict:
-    """Load credentials from macOS Keychain.
+    """Load credentials from .env file (primary) or Keychain (fallback).
 
     Raises:
-        SystemExit: If any credential is missing.
+        SystemExit: If any credential is missing from both sources.
     """
+    load_dotenv()
     creds = {
-        "garmin_username": keyring.get_password("garmin", "username"),
-        "garmin_password": keyring.get_password("garmin", "password"),
-        "intervals_api_key": keyring.get_password("intervals", "api_key"),
-        "intervals_athlete_id": keyring.get_password("intervals", "athlete_id"),
+        "garmin_username": os.getenv("GARMIN_USERNAME"),
+        "garmin_password": os.getenv("GARMIN_PASSWORD"),
+        "intervals_api_key": os.getenv("INTERVALS_API_KEY"),
+        "intervals_athlete_id": os.getenv("INTERVALS_ATHLETE_ID"),
     }
+
+    # Fallback to keyring for any missing values (Mac backward compat)
+    try:
+        import keyring
+        if not creds["garmin_username"]:
+            creds["garmin_username"] = keyring.get_password("garmin", "username")
+        if not creds["garmin_password"]:
+            creds["garmin_password"] = keyring.get_password("garmin", "password")
+        if not creds["intervals_api_key"]:
+            creds["intervals_api_key"] = keyring.get_password("intervals", "api_key")
+        if not creds["intervals_athlete_id"]:
+            creds["intervals_athlete_id"] = keyring.get_password("intervals", "athlete_id")
+    except Exception:
+        pass
 
     missing = [k for k, v in creds.items() if not v]
     if missing:
         logging.error(
-            "Missing Keychain credentials: %s. "
-            "See README for setup instructions.",
+            "Missing credentials: %s. Set them in .env or Keychain. See README.",
             ", ".join(missing),
         )
         sys.exit(1)
