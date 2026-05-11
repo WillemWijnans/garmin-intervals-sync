@@ -10,7 +10,7 @@
 #   get_stats()               → restingHeartRate, averageSpo2, avgWakingRespirationValue
 #   get_max_metrics()         → vo2Max (synthetic top-level, extracted from cycling/generic)
 #   get_body_composition()    → totalAverage.weight (BMI/body fat are not synced; revisit later)
-#   get_hrv_data()            → hrvSummary.weeklyAvg, hrvSummary.lastNight5MinHigh
+#   get_hrv_data()            → hrvSummarylastNightAvg,  hrvSummary.lastNight5MinHigh
 #   get_sleep_data()          → dailySleepDTO.avgHeartRate
 #   get_training_readiness()  → trainingReadiness (synthetic top-level, wake-up score)
 
@@ -28,7 +28,7 @@ mappings:
   - garmin_path: totalAverage.weight
     intervals_field: weight
     convert: grams_to_kg
-  - garmin_path: hrvSummary.weeklyAvg
+  - garmin_path: hrvSummary.lastNightAvg
     intervals_field: hrv
   - garmin_path: dailySleepDTO.avgHeartRate
     intervals_field: avgSleepingHR
