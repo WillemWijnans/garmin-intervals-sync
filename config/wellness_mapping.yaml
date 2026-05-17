@@ -9,7 +9,7 @@
 # Data sources per field:
 #   get_stats()               → restingHeartRate, averageSpo2, avgWakingRespirationValue
 #   get_max_metrics()         → vo2Max (synthetic top-level, extracted from cycling/generic)
-#   get_body_composition()    → totalAverage.weight (BMI/body fat are not synced; revisit later)
+#   get_body_composition()    → (fetched but unused — weight syncs via Intervals Companion from Withings → Apple Health. Restore mapping if Apple Health breaks.)
 #   get_hrv_data()            → hrvSummarylastNightAvg,  hrvSummary.lastNight5MinHigh
 #   get_sleep_data()          → dailySleepDTO.avgHeartRate
 #   get_training_readiness()  → trainingReadiness (synthetic top-level, wake-up score)
@@ -25,9 +25,6 @@ mappings:
     intervals_field: respiration
   - garmin_path: averageSpo2
     intervals_field: spO2
-  - garmin_path: totalAverage.weight
-    intervals_field: weight
-    convert: grams_to_kg
   - garmin_path: hrvSummary.lastNightAvg
     intervals_field: hrv
   - garmin_path: dailySleepDTO.avgHeartRate
