@@ -2,6 +2,8 @@
 
 Syncs wellness data from Garmin Connect to [Intervals.icu](https://intervals.icu) — fields that Intervals' built-in Garmin sync doesn't cover: SpO2, respiration rate, VO2 Max, Body Battery (→ readiness), body fat, BMI, and calories consumed. Runs as a daily cron job with a rolling 7-day window. All writes are idempotent PUTs, so re-running is always safe.
 
+> **Heads up:** This relies on [python-garminconnect](https://github.com/cyberjunky/python-garminconnect), which uses Garmin's **unofficial** (undocumented) API. Garmin can change it without notice, which may break syncing until the library is updated. See [Troubleshooting](#troubleshooting) if that happens. Use at your own risk — this is not affiliated with or endorsed by Garmin or Intervals.icu.
+
 ## Prerequisites
 
 - **Python 3.12+** (check with `python3 --version`)
@@ -12,7 +14,7 @@ Syncs wellness data from Garmin Connect to [Intervals.icu](https://intervals.icu
 ## Installation
 
 ```bash
-git clone <repo-url> ~/code/garmin-intervals-sync
+git clone https://github.com/WillemWijnans/garmin-intervals-sync.git ~/code/garmin-intervals-sync
 cd ~/code/garmin-intervals-sync
 python3 -m venv .venv
 source .venv/bin/activate
@@ -151,5 +153,6 @@ garmin-intervals-sync/
 ├── .env.example                   # Credential template (copy to .env)
 ├── .gitignore
 ├── requirements.txt
+├── LICENSE                         # MIT
 └── README.md
 ```
