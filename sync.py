@@ -157,6 +157,11 @@ def apply_mapping(garmin_data: dict, mappings: list[dict]) -> dict:
             top_key = garmin_path.split(".")[0]
             if top_key in garmin_data:
                 logger.debug("Field %s resolved to None, skipping", garmin_path)
+            elif entry.get("optional"):
+                # Marked optional: Garmin returns it only sometimes (e.g. vo2Max
+                # needs a qualifying activity). Absence is expected, not a
+                # misconfiguration — do not cry wolf every run.
+                logger.debug("Optional field %s absent today, skipping", garmin_path)
             else:
                 logger.warning(
                     "Garmin field '%s' not found in response — check mapping config",

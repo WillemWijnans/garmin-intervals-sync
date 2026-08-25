@@ -4,6 +4,9 @@
 # intervals_field:  field name for the Intervals.icu wellness PUT
 # convert:          optional unit conversion (grams_to_kg | ms_to_seconds | omit for none)
 # custom:           optional — set to true for Intervals.icu custom fields
+# optional:         set true when Garmin only returns the field SOMETIMES.
+#                   Suppresses the 'not found' warning without dropping the
+#                   mapping — the field still syncs on days it IS present.
 #                   (sent under {"custom": {...}} in the PUT body)
 #
 # Data sources per field:
@@ -19,6 +22,10 @@ mappings:
     intervals_field: restingHR
   - garmin_path: vo2Max
     intervals_field: vo2max
+    # Garmin only publishes a VO2max estimate after a qualifying activity, so the
+    # key is absent on ~44% of days. It syncs correctly when present (48 of 86
+    # days populated) — the absence is normal, not a mapping error.
+    optional: true
   - garmin_path: trainingReadiness
     intervals_field: readiness
   - garmin_path: avgWakingRespirationValue
