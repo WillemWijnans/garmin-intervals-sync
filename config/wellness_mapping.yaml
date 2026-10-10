@@ -39,3 +39,7 @@ mappings:
   - garmin_path: hrvSummary.lastNight5MinHigh
     intervals_field: HrvLastNight5MinHigh
     custom: true
+  - garmin_path: averageStressLevel
+    intervals_field: GarminAvgStress
+    custom: true
+    convert: nonnegative_or_none

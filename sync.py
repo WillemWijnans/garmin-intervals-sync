@@ -23,6 +23,9 @@ CONFIG_PATH = Path(__file__).parent / "config" / "wellness_mapping.yaml"
 CONVERTERS = {
     "grams_to_kg": lambda v: round(v / 1000, 2),
     "ms_to_seconds": lambda v: round(v / 1000, 1),
+    # Garmin reports -1/-2 for "not enough data" on stress-type fields; those
+    # are sentinels, not readings, and must never be stored as a value.
+    "nonnegative_or_none": lambda v: v if v is not None and v >= 0 else None,
 }
 
 
@@ -175,6 +178,10 @@ def apply_mapping(garmin_data: dict, mappings: list[dict]) -> dict:
                 logger.warning("Unknown converter '%s' for %s, skipping", convert, garmin_path)
                 continue
             value = converter(value)
+            if value is None:
+                logger.debug("Converter '%s' rejected %s for %s, skipping",
+                             convert, resolve_value(garmin_data, garmin_path), garmin_path)
+                continue
 
         if is_custom:
             custom[intervals_field] = value
